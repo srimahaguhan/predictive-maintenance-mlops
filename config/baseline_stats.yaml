@@ -1,0 +1,15 @@
+Air temperature [K]:
+  mean: 300.00493
+  std: 2.0002586829157516
+Process temperature [K]:
+  mean: 310.00555999999995
+  std: 1.4837342191657208
+Rotational speed [rpm]:
+  mean: 1538.7761
+  std: 179.2840959134266
+Tool wear [min]:
+  mean: 107.951
+  std: 63.65414663663636
+Torque [Nm]:
+  mean: 39.986909999999995
+  std: 9.968933725121337
