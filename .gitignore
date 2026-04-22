@@ -1,5 +1,20 @@
-!data/raw/.gitkeep
+
+
 .venv/
 __pycache__/
 *.pyc
+.DS_Store
+**/.DS_Store
+
+# Ignore all files in these directories...
 data/raw/*
+data/processed/*
+models/*
+
+# ...BUT do not ignore the .gitkeep or .dvc files!
+!data/**/.gitkeep
+!data/**/*.dvc
+!models/**/*.dvc
+
+.DS_Store
+**/.DS_Store
