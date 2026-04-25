@@ -1,0 +1,26 @@
+paths:
+  raw_data: "data/raw/ai4i2020.csv"
+  processed_data: "data/processed/cleaned_data.csv"
+  baseline_stats: "config/baseline_stats.yaml"
+  model_path: "models/model.pkl"
+
+data_source:
+  url: "https://archive.ics.uci.edu/static/public/601/ai4i+2020+predictive+maintenance+dataset.zip"
+  
+preprocessing: 
+  features:
+    - "Air temperature [K]"
+    - "Process temperature [K]"
+    - "Rotational speed [rpm]"
+    - "Torque [Nm]"
+    - "Tool wear [min]"
+  target: "Machine failure"
+
+mlflow:
+#when moving to the airflow container change the tracking_uri to http://mlfow:5000
+  tracking_uri: "http://127.0.0.1:5000"
+  experiment_name : "Predictive_Maintenance_v1"
+
+training:
+  test_size: 0.2
+  random_state: 42
