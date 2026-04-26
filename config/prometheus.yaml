@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s  # How often to pull metrics from targets
+  evaluation_interval: 15s # How often to check if alerting rules are triggered
+  
+  # Attach these labels to all metrics collected by this Prometheus instance
+  external_labels:
+    monitor: 'predictive-maintenance-system'
+
+# --- 1. ALERTING CONFIGURATION ---
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - 'alertmanager:9093' # The address of our AlertManager container
+
+# --- 2. RULE FILES ---
+rule_files:
+  - "alert_rules.yml" # We will create this file in the next step
+
+# --- 3. SCRAPE CONFIGURATIONS ---
+scrape_configs:
+  # Job 1: Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Job 2: Infrastructure Metrics (Requirement B)
+  # This pulls CPU, RAM, and Disk metrics from node_exporter
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']
+
+  # Job 3: AI Application Metrics (Requirement A)
+  # This pulls your FastAPI custom metrics (latency, memory, etc.)
+  - job_name: 'maintenance_api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:8000']

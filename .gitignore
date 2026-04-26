@@ -18,3 +18,22 @@ models/*
 
 .DS_Store
 **/.DS_Store
+
+# --- ML & MLOps Extras ---
+# If you ever run MLflow locally without the server, it creates this:
+mlruns/
+
+# Local Airflow databases and logs (if you accidentally run it outside Docker)
+airflow.db
+airflow-webserver.pid
+logs/
+
+# --- Environment & Secrets ---
+# Crucial if you start using Mailtrap or Postgres credentials
+.env
+.env.local
+
+# --- IDE & System ---
+.vscode/
+.idea/
+*.swp

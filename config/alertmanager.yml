@@ -1,0 +1,26 @@
+global:
+  # Mailtrap SMTP credentials
+  smtp_smarthost: 'sandbox.smtp.mailtrap.io:587'
+  smtp_from: 'alertmanager@predictive-maintenance.ai'
+  smtp_auth_username: 'b35b64f2f5b4d0' # Your Mailtrap User
+  smtp_auth_password: '2b09e6331ce5e4' # Your Mailtrap Pass
+  smtp_require_tls: true
+
+route:
+  # How to group alerts
+  group_by: ['alertname', 'severity']
+  group_wait: 30s      # Wait 30s to see if more alerts come in before sending
+  group_interval: 5m   # Wait 5m before sending a batch of new alerts
+  repeat_interval: 4h  # Re-send the alert every 4 hours if the issue isn't fixed
+  receiver: 'mailtrap-emails'
+
+receivers:
+  - name: 'mailtrap-emails'
+    email_configs:
+      - to: 'sg637@snu.edu.in' # Your recipient email from config.yaml
+        send_resolved: true     # Send an email when the problem is fixed!
+        html: |
+          <h3> Prometheus Alert: {{ .CommonLabels.alertname }}</h3>
+          <p><b>Severity:</b> {{ .CommonLabels.severity }}</p>
+          <p><b>Details:</b> {{ .CommonAnnotations.description }}</p>
+          <p><a href="http://localhost:9090">View in Prometheus</a></p>

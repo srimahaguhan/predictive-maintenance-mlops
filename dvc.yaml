@@ -1,0 +1,25 @@
+stages:
+  preprocess:
+    cmd: python src/preprocessing.py
+    deps:
+      - data/raw/sensor_data.csv
+      - src/preprocessing.py
+    outs:
+      - data/processed/cleaned_data.csv
+      - data/processed/scaling_params.joblib
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - data/processed/cleaned_data.csv
+      - src/train.py
+    outs:
+      - models/model.pkl
+    metrics:
+      - reports/metrics.json:
+          cache: false
+    plots:
+      - reports/confusion_matrix.csv:
+          template: confusion
+          x: actual
+          y: predicted

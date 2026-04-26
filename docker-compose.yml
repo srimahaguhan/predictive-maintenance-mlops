@@ -1,0 +1,121 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  airflow:
+    build:
+      context: .
+      dockerfile: docker/airflow.Dockerfile
+    depends_on:
+      - postgres
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./src:/opt/airflow/src
+      - ./config:/opt/airflow/config
+      - ./data:/opt/airflow/data
+      # to enable BashOperator (dvc repro) inside the container
+      # - ./.dvc:/opt/airflow/.dvc
+      # - ./.git:/opt/airflow/.git
+      # - ./dvc.yaml:/opt/airflow/dvc.yaml
+      # - ./dvc.lock:/opt/airflow/dvc.lock
+      - .:/opt/airflow
+    environment:
+      # - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      # - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      # - PYTHONPATH=/opt/airflow
+      # - AIRFLOW__SMTP__SMTP_HOST=sandbox.smtp.mailtrap.io
+      # - AIRFLOW__SMTP__SMTP_STARTTLS=True
+      # - AIRFLOW__SMTP__SMTP_SSL=False
+      # - AIRFLOW__SMTP__SMTP_USER=b35b64f2f5b4d0
+      # - AIRFLOW__SMTP__SMTP_PASSWORD=2b09e6331ce5e4
+      # - AIRFLOW__SMTP__SMTP_PORT=587
+      # - AIRFLOW__SMTP__SMTP_MAIL_FROM=sg637@snu.edu.in
+      # - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
+      # - AIRFLOW__CORE__AUTH_MANAGER=airflow.auth.managers.simple.simple_auth_manager.SimpleAuthManager
+      # - AIRFLOW__SIMPLE_AUTH_MANAGER__USERS=admin:admin
+      # - 'AIRFLOW__SIMPLE_AUTH_MANAGER__PASSWORDS={"admin": "admin1234"}'
+
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - PYTHONPATH=/opt/airflow
+      # --- AUTHENTICATION (The FAB Way) ---
+      - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin1234
+      # --- SMTP SETTINGS ---
+      # - AIRFLOW__SMTP__SMTP_HOST=sandbox.smtp.mailtrap.io
+      # - AIRFLOW__SMTP__SMTP_PORT=2525
+      # - AIRFLOW__SMTP__SMTP_USER=b35b64f2f5b4d0
+      # - AIRFLOW__SMTP__SMTP_PASSWORD=2b09e6331ce5e4
+      # - AIRFLOW__SMTP__SMTP_MAIL_FROM=sg637@snu.edu.in
+      # - AIRFLOW__SMTP__SMTP_STARTTLS=True
+      # - AIRFLOW__SMTP__SMTP_SSL=False
+      - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
+      - AIRFLOW__CORE__FERNET_KEY=est2hiXyCL-OMEN9uWNh0ZG4qHjVGhlmCQ3L6pB3Zp0=
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - NO_PROXY=mlflow,localhost,127.0.0.1
+      
+    ports:
+      - "8080:8080"
+    # command: standalone
+
+    command: >
+      bash -c "airflow db migrate && 
+               airflow api-server & 
+               airflow scheduler"
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    ports:
+      - "5000:5000"
+    command: mlflow server --host 0.0.0.0
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models
+      - ./config:/app/config
+      - ./data:/app/data
+    depends_on:
+      - airflow
+    environment:
+      - PYTHONPATH=/app
+  
+  node_exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "9100:9100"
+  
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    volumes:
+      - ./config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "9093:9093"
+
+volumes:
+  postgres_data:

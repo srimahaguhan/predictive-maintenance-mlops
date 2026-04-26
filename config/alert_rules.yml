@@ -1,0 +1,49 @@
+groups:
+  - name: predictive_maintenance_alerts
+    rules:
+
+      # 1. FAILURES: High Error Rate (Requirement C)
+      # Triggered if more than 10% of predictions result in an error over 5 mins
+      - alert: HighApiErrorRate
+        expr: |
+          sum(rate(api_predictions_total{result="error"}[5m])) 
+          / 
+          sum(rate(api_predictions_total[5m])) > 0.10
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API Error Rate Detected"
+          description: "API error rate is above 10% for the last 2 minutes. Current client: {{ $labels.client_id }}"
+
+      # 2. RESOURCE OVERUSE: High CPU Usage (Requirement C)
+      # Triggered if CPU usage exceeds 80% for more than 2 minutes
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU Usage on Host"
+          description: "CPU usage is at {{ $value | printf \"%.2f\" }}% on instance {{ $labels.instance }}."
+
+      # 3. ANOMALIES: High Inference Latency (Requirement C)
+      # Triggered if 95% of requests (P95) take longer than 0.5 seconds
+      - alert: HighInferenceLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(api_inference_duration_seconds_bucket[5m]))) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Inference Latency Anomaly"
+          description: "95% of inference requests are taking longer than 0.5s (Current: {{ $value | printf \"%.2f\" }}s)."
+
+      # 4. HEALTH: API Down (Application Health)
+      - alert: ApiServiceDown
+        expr: up{job="maintenance_api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Inference API is Down"
+          description: "The FastAPI service has been unreachable for more than 1 minute."

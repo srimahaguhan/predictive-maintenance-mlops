@@ -1,11 +1,12 @@
 paths:
-  raw_data: "data/raw/ai4i2020.csv"
+  raw_data: "data/raw/sensor_data.csv"
   processed_data: "data/processed/cleaned_data.csv"
   baseline_stats: "config/baseline_stats.yaml"
   model_path: "models/model.pkl"
 
 data_source:
   url: "https://archive.ics.uci.edu/static/public/601/ai4i+2020+predictive+maintenance+dataset.zip"
+  # url: "https://archive.ics.uci.edu/static/public/601/this-file-is-fake.zip"
   
 preprocessing: 
   features:
@@ -18,9 +19,45 @@ preprocessing:
 
 mlflow:
 #when moving to the airflow container change the tracking_uri to http://mlfow:5000
-  tracking_uri: "http://127.0.0.1:5000"
+  tracking_uri: "http://mlflow:5000"
   experiment_name : "Predictive_Maintenance_v1"
 
 training:
   test_size: 0.2
   random_state: 42
+
+notifications:
+  recipient_email: "sg637@snu.edu.in"
+
+# MONITORING STACK 
+
+prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/alert_rules.yml:/etc/prometheus/alert_rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - "9090:9090"
+
+node_exporter:
+  image: prom/node-exporter:latest
+  ports:
+    - "9100:9100"
+
+grafana:
+  image: grafana/grafana:latest
+  ports:
+    - "3000:3000"
+  environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+  depends_on:
+    - prometheus
+
+alertmanager:
+  image: prom/alertmanager:latest
+  ports:
+    - "9093:9093"
+  volumes:
+    - ./config/alertmanager.yml:/etc/alertmanager/alertmanager.yml
