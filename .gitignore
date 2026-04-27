@@ -36,4 +36,4 @@ logs/
 # --- IDE & System ---
 .vscode/
 .idea/
-*.swp
+*.swpairflow.cfg

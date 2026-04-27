@@ -1,0 +1,43 @@
+global:
+  scrape_interval: 15s  
+  evaluation_interval: 15s 
+  
+  external_labels:
+    monitor: 'predictive-maintenance-system'
+
+# --- 1. ALERTING CONFIGURATION ---
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - 'alertmanager:9093'
+
+# --- 2. RULE FILES ---
+rule_files:
+  - "alert_rules.yml" 
+
+# --- 3. SCRAPE CONFIGURATIONS ---
+scrape_configs:
+  # Job 1: Monitor Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Job 2: Infrastructure Metrics (Node Exporter)
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets: ['node_exporter:9100']
+
+  # Job 3: Training Metrics (The Batch Job Middleman)
+  # honor_labels: true is critical here so that the 'job' name 
+  # we set in our Python script isn't overwritten by Prometheus.
+  - job_name: 'pushgateway'
+    honor_labels: true
+    static_configs:
+      - targets: ['pushgateway:9091']
+
+  # Job 4: AI Application Metrics (Requirement A)
+  - job_name: 'maintenance_api'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['api:8000']

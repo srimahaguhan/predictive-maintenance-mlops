@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   postgres:
     image: postgres:13
@@ -8,6 +7,8 @@ services:
       - POSTGRES_DB=airflow
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - airflow-network
 
   airflow:
     build:
@@ -26,6 +27,7 @@ services:
       # - ./dvc.yaml:/opt/airflow/dvc.yaml
       # - ./dvc.lock:/opt/airflow/dvc.lock
       - .:/opt/airflow
+      - ./mlruns:/mlruns
     environment:
       # - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       # - AIRFLOW__CORE__EXECUTOR=LocalExecutor
@@ -70,12 +72,24 @@ services:
       bash -c "airflow db migrate && 
                airflow api-server & 
                airflow scheduler"
+    
+    networks:
+      - airflow-network
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
+    container_name: mlflow
     ports:
       - "5000:5000"
-    command: mlflow server --host 0.0.0.0
+    volumes:
+      - ./mlruns:/mlruns
+    networks:
+      - airflow-network
+    command: >
+      mlflow server 
+      --backend-store-uri file:///mlruns 
+      --default-artifact-root file:///mlruns 
+      --host 0.0.0.0
 
   api:
     build:
@@ -91,6 +105,8 @@ services:
       - airflow
     environment:
       - PYTHONPATH=/app
+    networks:         
+      - airflow-network
   
   node_exporter:
     image: prom/node-exporter:latest
@@ -106,6 +122,8 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
     ports:
       - "9100:9100"
+    networks:
+      - airflow-network
   
   alertmanager:
     image: prom/alertmanager:latest
@@ -116,6 +134,40 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
     ports:
       - "9093:9093"
+  
+  pushgateway:
+    image: prom/pushgateway:latest
+    container_name: pushgateway
+    ports:
+      - "9091:9091"
+    networks:
+      - airflow-network # Ensure this matches your existing network name
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/alert_rules.yml:/etc/prometheus/alert_rules.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - airflow-network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - airflow-network
 
 volumes:
   postgres_data:
+
+networks:
+  airflow-network:
+    driver: bridge
+

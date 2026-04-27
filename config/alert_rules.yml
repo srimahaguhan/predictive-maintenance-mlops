@@ -47,3 +47,12 @@ groups:
         annotations:
           summary: "Inference API is Down"
           description: "The FastAPI service has been unreachable for more than 1 minute."
+  
+  - name: model_performance_alerts
+    rules:
+      - alert: LowModelAccuracy
+        expr: training_f1_macro < 0.60
+        for: 1m
+        annotations:
+          summary: "Model Performance Degradation"
+          description: "The latest training run produced an F1 Macro score of {{ $value }}, which is below the 0.60 threshold."
