@@ -62,7 +62,9 @@ services:
       - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
       - AIRFLOW__CORE__FERNET_KEY=est2hiXyCL-OMEN9uWNh0ZG4qHjVGhlmCQ3L6pB3Zp0=
       - MLFLOW_TRACKING_URI=http://mlflow:5000
-      - NO_PROXY=mlflow,localhost,127.0.0.1
+      - NO_PROXY=mlflow,pushgateway,localhost,127.0.0.1
+      - PUSHGATEWAY_URL=http://pushgateway:9091
+      - PYTHONPATH=/opt/airflow
       
     ports:
       - "8080:8080"
@@ -90,6 +92,7 @@ services:
       --backend-store-uri file:///mlruns 
       --default-artifact-root file:///mlruns 
       --host 0.0.0.0
+      --allowed-hosts "*"
 
   api:
     build:
@@ -134,6 +137,8 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
     ports:
       - "9093:9093"
+    networks:
+      - airflow-network
   
   pushgateway:
     image: prom/pushgateway:latest
@@ -161,6 +166,20 @@ services:
       - "3001:3000"
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - airflow-network
+  
+  ui:
+    build:
+      context: .
+      dockerfile: docker/ui.Dockerfile
+    container_name: streamlit_ui
+    environment:
+      - API_URL=http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
     networks:
       - airflow-network
 

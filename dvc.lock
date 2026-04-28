@@ -29,8 +29,8 @@ stages:
       size: 1120249
     - path: src/train.py
       hash: md5
-      md5: 1364155dd188e45eb7fe06bcbb1b521a
-      size: 5002
+      md5: d8914b658240ae910f9bbc267488c93c
+      size: 4335
     outs:
     - path: models/model.pkl
       hash: md5
@@ -38,9 +38,9 @@ stages:
       size: 1690441
     - path: reports/confusion_matrix.csv
       hash: md5
-      md5: 1956a5432579acbf2d14192c61ec624d
-      size: 17
+      md5: de6a996b3d27744e022cd5e412c645de
+      size: 8017
     - path: reports/metrics.json
       hash: md5
-      md5: e25af264ed18f6cb8ec65acc72b75ed9
-      size: 169
+      md5: a48f4558f86bcd669fa59829093b5b9d
+      size: 145

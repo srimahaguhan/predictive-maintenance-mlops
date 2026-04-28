@@ -20,7 +20,7 @@ groups:
       # Triggered if CPU usage exceeds 80% for more than 2 minutes
       - alert: HostHighCpuLoad
         expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[2m])) * 100) > 80
-        for: 2m
+        for: 10s
         labels:
           severity: warning
         annotations:

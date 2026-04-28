@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <title>DVC Plot</title>
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.18.2"></script>
+    
+    <style>
+        table {
+            border-spacing: 15px;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id = "___config_reports_confusion_matrix_csv">
+        <script type = "text/javascript">
+            var spec = {};
+            vegaEmbed('#___config_reports_confusion_matrix_csv', spec);
+        </script>
+    </div>
+    
+
+    <div id = "___config_reports_metrics_json">
+        <script type = "text/javascript">
+            var spec = {};
+            vegaEmbed('#___config_reports_metrics_json', spec);
+        </script>
+    </div>
+    
+
+    <div id = "___reports_confusion_matrix_csv">
+        <script type = "text/javascript">
+            var spec = {};
+            vegaEmbed('#___reports_confusion_matrix_csv', spec);
+        </script>
+    </div>
+    
+</body>
+</html>

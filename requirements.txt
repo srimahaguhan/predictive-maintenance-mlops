@@ -14,3 +14,4 @@ psutil
 joblib 
 pydantic 
 dvc==3.67.1
+streamlit
