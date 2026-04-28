@@ -8,8 +8,8 @@ groups:
         expr: |
           sum(rate(api_predictions_total{result="error"}[5m])) 
           / 
-          sum(rate(api_predictions_total[5m])) > 0.10
-        for: 2m
+          sum(rate(api_predictions_total[5m])) > 0.05
+        for: 1m
         labels:
           severity: critical
         annotations:

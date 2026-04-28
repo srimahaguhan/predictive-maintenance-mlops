@@ -11,12 +11,14 @@ RUN apt-get update && apt-get install -y \
 
 # 2. Copy and install requirements
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --default-timeout=1000 -r requirements.txt
 
 # 3. Copy the source code and configuration
 # We only copy what the API needs to run
-COPY src/ ./src/
-COPY config/ ./config/
+# COPY src/ ./src/
+# COPY config/ ./config/
+
+COPY . .
 
 # 4. Set environment variables
 # This ensures Python can find your 'src' module

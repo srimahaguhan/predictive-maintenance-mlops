@@ -21,29 +21,9 @@ services:
       - ./src:/opt/airflow/src
       - ./config:/opt/airflow/config
       - ./data:/opt/airflow/data
-      # to enable BashOperator (dvc repro) inside the container
-      # - ./.dvc:/opt/airflow/.dvc
-      # - ./.git:/opt/airflow/.git
-      # - ./dvc.yaml:/opt/airflow/dvc.yaml
-      # - ./dvc.lock:/opt/airflow/dvc.lock
       - .:/opt/airflow
       - ./mlruns:/mlruns
     environment:
-      # - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
-      # - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      # - PYTHONPATH=/opt/airflow
-      # - AIRFLOW__SMTP__SMTP_HOST=sandbox.smtp.mailtrap.io
-      # - AIRFLOW__SMTP__SMTP_STARTTLS=True
-      # - AIRFLOW__SMTP__SMTP_SSL=False
-      # - AIRFLOW__SMTP__SMTP_USER=b35b64f2f5b4d0
-      # - AIRFLOW__SMTP__SMTP_PASSWORD=2b09e6331ce5e4
-      # - AIRFLOW__SMTP__SMTP_PORT=587
-      # - AIRFLOW__SMTP__SMTP_MAIL_FROM=sg637@snu.edu.in
-      # - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
-      # - AIRFLOW__CORE__AUTH_MANAGER=airflow.auth.managers.simple.simple_auth_manager.SimpleAuthManager
-      # - AIRFLOW__SIMPLE_AUTH_MANAGER__USERS=admin:admin
-      # - 'AIRFLOW__SIMPLE_AUTH_MANAGER__PASSWORDS={"admin": "admin1234"}'
-
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - PYTHONPATH=/opt/airflow
@@ -51,14 +31,6 @@ services:
       - AIRFLOW__CORE__AUTH_MANAGER=airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
       - _AIRFLOW_WWW_USER_USERNAME=admin
       - _AIRFLOW_WWW_USER_PASSWORD=admin1234
-      # --- SMTP SETTINGS ---
-      # - AIRFLOW__SMTP__SMTP_HOST=sandbox.smtp.mailtrap.io
-      # - AIRFLOW__SMTP__SMTP_PORT=2525
-      # - AIRFLOW__SMTP__SMTP_USER=b35b64f2f5b4d0
-      # - AIRFLOW__SMTP__SMTP_PASSWORD=2b09e6331ce5e4
-      # - AIRFLOW__SMTP__SMTP_MAIL_FROM=sg637@snu.edu.in
-      # - AIRFLOW__SMTP__SMTP_STARTTLS=True
-      # - AIRFLOW__SMTP__SMTP_SSL=False
       - AIRFLOW__EMAIL__EMAIL_BACKEND=airflow.utils.email.send_email_smtp
       - AIRFLOW__CORE__FERNET_KEY=est2hiXyCL-OMEN9uWNh0ZG4qHjVGhlmCQ3L6pB3Zp0=
       - MLFLOW_TRACKING_URI=http://mlflow:5000
@@ -146,7 +118,7 @@ services:
     ports:
       - "9091:9091"
     networks:
-      - airflow-network # Ensure this matches your existing network name
+      - airflow-network 
 
   prometheus:
     image: prom/prometheus:latest

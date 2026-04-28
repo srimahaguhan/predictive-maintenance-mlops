@@ -1,0 +1,6 @@
+name: Predictive_Maintenance
+docker_env:
+  image: predictive-maintenance-mlops-api:latest
+entry_points:
+  main:
+    command: "python src/train.py"

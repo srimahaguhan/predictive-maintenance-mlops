@@ -64,6 +64,10 @@ REQUEST_SUMMARY = Summary(
 def health_check():
     return {"status": "healthy", "model_loaded": True}
 
+@app.get("/ready")
+def ready_check():
+    return {"status": "ready"}
+
 @app.get("/metrics")
 def get_metrics():
     """Endpoint for Prometheus to scrape."""

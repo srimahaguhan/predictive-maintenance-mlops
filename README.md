@@ -139,3 +139,30 @@ predictive-maintenance-mlops/
 │   ├── train.py            # Model training & tracking script
 │   └── utils.py            # Common helper functions
 └── ui_requirements.txt     # Frontend-specific dependencies
+
+## 9. Testing & Continuous Integration (CI)
+```text 
+This project implements a containerized testing strategy to ensure **Environment Parity** and **Inference Integrity**. Instead of testing on the host machine (macOS), all validations are performed within the production-grade Linux environment of the Docker container.
+
+---
+
+## The "CI Gate" Command
+
+To verify the application health and model logic, execute the following command:
+
+```bash
+docker exec -it predictive-maintenance-mlops-api-1 pytest tests/test_api.py
+```
+
+---
+
+## What is Being Verified?
+
+### 1. API Health (`/health`)
+Confirms the FastAPI server is live and networking is routed correctly.
+
+### 2. Model Readiness (`/ready`)
+Verifies that the `.pkl` model artifact is successfully loaded into memory.
+
+### 3. Inference Logic (`/predict`)
+Simulates a real-world sensor payload to ensure the preprocessing pipeline and model decision boundaries are functioning as expected.
