@@ -26,7 +26,7 @@ def send_custom_email(subject, html_content):
     msg.attach(MIMEText(html_content, 'html'))
 
     try:
-        # Use port 2525 and explicit starttls to stop the SSL Version error
+        # Using port 2525 and explicit starttls to stop the SSL Version error
         with smtplib.SMTP('sandbox.smtp.mailtrap.io', 2525, timeout=30) as server:
             server.starttls() 
             server.login('b35b64f2f5b4d0', '2b09e6331ce5e4')

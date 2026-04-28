@@ -95,7 +95,7 @@ def train():
         mlflow.log_metrics(metrics)
         push_metrics_to_prometheus(metrics)
 
-        # 4. Save Artifacts (DVC expects these exact paths)
+        # 4. Saving Artifacts (DVC expects these exact paths)
         os.makedirs('reports', exist_ok=True)
         with open('reports/metrics.json', 'w') as f:
             json.dump(metrics, f, indent=4)
@@ -111,7 +111,6 @@ def train():
         df_plot.to_csv('reports/confusion_matrix.csv', index=False)
             
         os.makedirs('models', exist_ok=True)
-        # Ensure model extension matches your dvc.yaml (e.g., .pkl)
         joblib.dump(model, config['paths']['model_path'])
         
         mlflow.sklearn.log_model(model, "random_forest_model")

@@ -1,5 +1,4 @@
 global:
-  # Mailtrap SMTP credentials - keep 587 for TLS
   smtp_smarthost: 'sandbox.smtp.mailtrap.io:587'
   smtp_from: 'alertmanager@predictive-maintenance.ai'
   smtp_auth_username: 'b35b64f2f5b4d0' 

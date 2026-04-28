@@ -47,9 +47,9 @@ def preprocess():
     os.makedirs(os.path.dirname(processed_path), exist_ok=True)
     df.to_csv(processed_path, index=False)
     
-    print(f"✅ Scaler saved to {scaler_path}")
-    print(f"✅ Processed data saved to {processed_path}")
-    print(f"✅ Baselines stored in {baseline_path}")
+    print(f"Scaler saved to {scaler_path}")
+    print(f"Processed data saved to {processed_path}")
+    print(f"Baselines stored in {baseline_path}")
 
 if __name__ == "__main__":
     preprocess()
